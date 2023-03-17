@@ -1,0 +1,16 @@
+{
+    "_comment": "This is currently non-functional.  Use this file to make your module installable through composer.  Replace 'parent_repository' in the name property below with the appropriate location",
+    "name": "parent_repository/mediacp",
+    "description": "Media Control Panel provides a control panel for selling audio and video streaming services.",
+    "license": "proprietary",
+    "type": "blesta-module",
+    "require": {
+        "blesta/composer-installer": "~1.0"
+    },
+    "authors": [
+        {
+            "name": "MediaCP",
+            "homepage": "https://www.mediacp.net"
+        }
+    ]
+}

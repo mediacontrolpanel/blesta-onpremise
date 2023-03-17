@@ -1,0 +1,35 @@
+{
+    "version": "1.0.0",
+    "name": "Mediacp.name",
+    "description": "Mediacp.description",
+    "authors": [
+        {
+            "name": "MediaCP",
+            "url": "https://www.mediacp.net"
+        }
+    ],
+    "module": {
+        "row": "Mediacp.module_row",
+        "rows": "Mediacp.module_row_plural",
+        "group": "Mediacp.module_group",
+        "row_key": "hostname"
+    },
+    "package": {
+        "name_key": "media_service",
+        "name_key": "autodj",
+        "name_key": "servicetype",
+        "name_key": "connections",
+        "name_key": "bitrate",
+        "name_key": "bandwidth",
+        "name_key": "quota",
+        "name_key": "streamtargets"
+    },
+    "service": {
+        "name_key": "name"
+    },
+    "email_tags": {
+        "module": ["hostname","port","usessl","apikey"],
+        "package": ["media_service","autodj","servicetype","connections","bitrate","bandwidth","quota","streamtargets"],
+        "service": ["name","portbase","username","password","customer_id","service_id"]
+    }
+}

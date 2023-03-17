@@ -1,0 +1,26 @@
+
+    <div id="restart">
+        <h4><?php $this->_('Mediacp.restart.heading');?></h4>
+
+        <?php
+        $this->Form->create(
+//// $this->base_uri . 'clients/serviceTab/' . (isset($client_id) ? $client_id : null) . '/' . (isset($service_id) ? $service_id : null) . '/restart/'
+        );
+        ?>
+        <div class="col-md-12">
+            <p>This is a very simple service management tab, created by the extension generator.  The content
+                of this file can be modified at <?php echo COMPONENTDIR . 'modules' . DS . 'mediacp' . DS . 'views' . DS . 'default' . DS . 'restart.pdt';?>.
+                Included here is a basic form that can be submitted and is handled by the restart() method in <?php echo COMPONENTDIR . 'modules' . DS . 'mediacp' . DS . 'mediacp.php';?>
+            </p>
+
+            <div class="button_row">
+                <button class="btn btn-default pull-right">
+                    <i class="fas fa-edit"></i> <?php $this->_('Mediacp.restart.submit');?>
+                </button>
+            </div>
+        </div>
+        <?php
+        $this->Form->end();
+        ?>
+
+    </div>
