@@ -104,8 +104,15 @@ $lang['Mediacp.service_info.customer_id'] = 'Customer ID';
 $lang['Mediacp.service_info.service_id'] = 'Service ID';
 $lang['Mediacp.service_info.service_password'] = 'Service Password';
 ////// These are the definitions for if you are trying to include a login link in the service info pages
-////$lang['Mediacp.service_info.options'] = 'Options';
-////$lang['Mediacp.service_info.option_login'] = 'Login';
+$lang['Mediacp.service_info.type'] = 'Type';
+$lang['Mediacp.service_info.video'] = 'Video Streaming';
+$lang['Mediacp.service_info.audio'] = 'Audio Streaming';
+$lang['Mediacp.service_info.options'] = 'Options';
+$lang['Mediacp.service_info.option_login'] = 'Login';
+$lang['Mediacp.service_info.option_login'] = 'Login';
+$lang['Mediacp.service_info.option_service_link'] = 'Service';
+$lang['Mediacp.service_info.option_public_page'] = 'Public Page';
+$lang['Mediacp.service_info.option_manage'] = 'Manage';
 
 // Service Fields
 $lang['Mediacp.service_fields.name'] = 'Service Name';
@@ -136,6 +143,9 @@ $lang['Mediacp.package_field.tooltip.bitrate'] = 'Kbps';
 $lang['Mediacp.package_field.tooltip.bandwidth'] = 'MB';
 $lang['Mediacp.package_field.tooltip.quota'] = 'MB';
 $lang['Mediacp.package_field.tooltip.streamtargets'] = 'Unlimited or numeric value';
+
+
+$lang['Mediacp.client_service_info'] = 'Service Name';
 
 // Cron Tasks
 

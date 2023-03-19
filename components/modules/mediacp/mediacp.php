@@ -1398,6 +1398,7 @@ class Mediacp extends Module
     public function getClientTabs($package)
     {
         return [
+        #   'tabClientServiceInfo' => Language::_('Mediacp.client_service_info', true),
             'login' => Language::_('Mediacp.login', true)
         ];
     }
@@ -1459,7 +1460,7 @@ class Mediacp extends Module
 
         $module = $this->getModuleRow();
 
-        $url = ($module->meta->usessl=="true"?"https://":"http://") . $module->meta->hostname . ":" . $module->meta->port;
+        $url = ($module->meta->usessl=="true"?"https://":"http://") . $module->meta->hostname . ":" . $module->meta->port . "/?username={$service_fields->username}&password={$service_fields->password}";
         header("Location: {$url}");
         exit;
     }
@@ -1785,4 +1786,64 @@ class Mediacp extends Module
 
         return $fields;
     }
+
+
+
+    /**
+     * Fetches the HTML content to display when viewing the service info in the
+     * client interface.
+     *
+     * @param stdClass $service A stdClass object representing the service
+     * @param stdClass $package A stdClass object representing the service's package
+     * @return string HTML content containing information to display when viewing the service info
+     */
+    public function getClientServiceInfo($service, $package)
+    {
+        $row = $this->getModuleRow();
+
+        // Load the view into this object, so helpers can be automatically added to the view
+        $this->view = new View('client_service_info', 'default');
+        $this->view->base_uri = $this->base_uri;
+        $this->view->setDefaultView('components' . DS . 'modules' . DS . 'mediacp' . DS);
+
+        // Load the helpers required for this view
+        Loader::loadHelpers($this, ['Form', 'Html']);
+
+        $this->view->set('module_row', $row);
+        $this->view->set('package', $package);
+        $this->view->set('service', $service);
+        $this->view->set('service_fields', $this->serviceFieldsToObject($service->fields));
+        $this->view->set('isVideoService', !in_array($package->meta->media_service, ['shoutcast198','shoutcast2','icecast','icecast_kh']) );
+
+        return $this->view->fetch();
+    }
+    /**
+     * Fetches the HTML content to display when viewing the service info in the
+     * admin interface.
+     *
+     * @param stdClass $service A stdClass object representing the service
+     * @param stdClass $package A stdClass object representing the service's package
+     * @return string HTML content containing information to display when viewing the service info
+     */
+    public function getAdminServiceInfo($service, $package)
+    {
+        $row = $this->getModuleRow();
+
+        // Load the view into this object, so helpers can be automatically added to the view
+        $this->view = new View('admin_service_info', 'default');
+        $this->view->base_uri = $this->base_uri;
+        $this->view->setDefaultView('components' . DS . 'modules' . DS . 'mediacp' . DS);
+
+        // Load the helpers required for this view
+        Loader::loadHelpers($this, ['Form', 'Html']);
+
+        $this->view->set('module_row', $row);
+        $this->view->set('package', $package);
+        $this->view->set('service', $service);
+        $this->view->set('service_fields', $this->serviceFieldsToObject($service->fields));
+        $this->view->set('isVideoService', !in_array($package->meta->media_service, ['shoutcast198','shoutcast2','icecast','icecast_kh']) );
+
+        return $this->view->fetch();
+    }
+
 }
