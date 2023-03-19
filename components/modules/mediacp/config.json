@@ -30,6 +30,6 @@
     "email_tags": {
         "module": ["hostname","port","usessl","apikey"],
         "package": ["media_service","autodj","servicetype","connections","bitrate","bandwidth","quota","streamtargets"],
-        "service": ["name","portbase","username","password","customer_id","service_id"]
+        "service": ["name","portbase","username","password","customer_id","service_id","service_password"]
     }
 }

@@ -102,6 +102,7 @@ $lang['Mediacp.service_info.username'] = 'Username';
 $lang['Mediacp.service_info.password'] = 'Password';
 $lang['Mediacp.service_info.customer_id'] = 'Customer ID';
 $lang['Mediacp.service_info.service_id'] = 'Service ID';
+$lang['Mediacp.service_info.service_password'] = 'Service Password';
 ////// These are the definitions for if you are trying to include a login link in the service info pages
 ////$lang['Mediacp.service_info.options'] = 'Options';
 ////$lang['Mediacp.service_info.option_login'] = 'Login';
@@ -113,6 +114,7 @@ $lang['Mediacp.service_fields.username'] = 'Username';
 $lang['Mediacp.service_fields.password'] = 'Password';
 $lang['Mediacp.service_fields.customer_id'] = 'Customer ID';
 $lang['Mediacp.service_fields.service_id'] = 'Service ID';
+$lang['Mediacp.service_fields.service_password'] = 'Service Password';
 
 
 

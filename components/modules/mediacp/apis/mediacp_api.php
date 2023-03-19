@@ -57,7 +57,7 @@ class MediacpApi
      * @param string $method Data transfer method (POST, GET, PUT, DELETE)
      * @return MediacpResponse
      */
-    public function apiRequest($route, array $body, $method)
+    public function apiRequest($route, array $body = [], $method = 'GET')
     {
         $url = $this->apiUrl . '/' . $route;
         $curl = curl_init();

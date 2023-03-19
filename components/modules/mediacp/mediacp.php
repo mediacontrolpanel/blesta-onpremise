@@ -698,17 +698,20 @@ class Mediacp extends Module
     public function getVideoServiceTypesValues()
     {
         $values = [
-            '0' => 'Live Streaming',
-            '1' => 'TV Station',
-            '2' => 'Ondemand Streaming',
-            '3' => 'Stream Relay',
+            'Live Streaming',
+            'TV Station',
+            'Ondemand Streaming',
+            'Stream Relay',
         ];
 
         return $values;
     }
     public function getBitrateSelectionValues()
     {
-        return explode(",", "24,32,40,48,56,64,80,96,112,128,160,192,224,256,320,400,480,560,640,720,800,920,1024,1280,1536,1792,2048,2560,3072,3584,4096,4068,5120,5632,6144,6656,7168,7680,8192,9216,10240,11264,12228,13312,14336,99999");
+        $ret = [];
+        $bitrates = explode(",", "24,32,40,48,56,64,80,96,112,128,160,192,224,256,320,400,480,560,640,720,800,920,1024,1280,1536,1792,2048,2560,3072,3584,4096,4068,5120,5632,6144,6656,7168,7680,8192,9216,10240,11264,12228,13312,14336,99999");
+        foreach($bitrates as $bitrate) $ret[$bitrate] = "{$bitrate} Kbps";
+        return $ret;
     }
     /**
      * Adds the service to the remote server. Sets Input errors on failure,
@@ -814,6 +817,7 @@ class Mediacp extends Module
             $vars['password'] = $userPassword;
             $vars['customer_id'] = $service->user_id;
             $vars['service_id'] = $service->id;
+            $vars['service_password'] = $service->adminpassword;
         }
 
         // Return service fields
@@ -846,6 +850,11 @@ class Mediacp extends Module
             [
                 'key' => 'service_id',
                 'value' => $vars['service_id'],
+                'encrypted' => 0
+            ],
+            [
+                'key' => 'service_password',
+                'value' => $vars['service_password'],
                 'encrypted' => 0
             ]
         ];
@@ -910,36 +919,20 @@ class Mediacp extends Module
      */
     public function editService($package, $service, array $vars = null, $parent_package = null, $parent_service = null)
     {
-////// Modules often load an API object to perform necessary actions on the remote server.  Below is some code
-////// to ensure that we have a module row to connect to the server and to load the API object.  You will want
-////// to replace the parameters being submitted to the method with those relevant for your module.  Uncomment
-////// the getApi() method below and modify the parameters and doc comments
-////        $row = $this->getModuleRow();
-////
-////        if (!$row) {
-////            $this->Input->setErrors(
-////                ['module_row' => ['missing' => Language::_('Mediacp.!error.module_row.missing', true)]]
-////            );
-////
-////            return;
-////        }
-////
-////        $api = $this->getApi($row->meta->host_name, $row->meta->user_name, $row->meta->password, $row->meta->use_ssl);
-////
-////// Modules often find it useful to do some processing and formatting before submitting data to the API.  Uncomment
-////// the getFieldsFromInput() method below and update it to suite your needs.
-////        $params = $this->getFieldsFromInput((array) $vars, $package);
 
-        // Set unset checkboxes
-        $checkbox_fields = [];
+        $row = $this->getModuleRow();
 
-        foreach ($checkbox_fields as $checkbox_field) {
-            if (!isset($vars[$checkbox_field])) {
-                $vars[$checkbox_field] = 'false';
-            }
+        if (!$row) {
+            $this->Input->setErrors(
+                ['module_row' => ['missing' => Language::_('Mediacp.!error.module_row.missing', true)]]
+            );
+
+            return;
         }
 
-        $service_fields = $this->serviceFieldsToObject($service->fields);
+        $serviceFields = $this->serviceFieldsToObject($service->fields);
+
+
 
         $this->validateService($package, $vars, true);
 
@@ -948,18 +941,58 @@ class Mediacp extends Module
         }
 
         // Only update the service if 'use_module' is true
+
+
+        // Only provision the service if 'use_module' is true
         if ($vars['use_module'] == 'true') {
+
+            # Load Client Details
+            Loader::loadModels($this, ['Clients']);
+            $client = $this->Clients->get($vars['client_id'], false);
+
+            # Setup API
+            $api = $this->getApi($row->meta->hostname, $row->meta->port, $row->meta->usessl, $row->meta->apikey);
+
+            # Lookup user information
+            $response = $api->apiRequest("/api/0/user/show/{$serviceFields->customer_id}");
+
+            $user = $response->response();
+
+            if ( !$user || empty($user->id) ) {
+                $this->Input->setErrors(['api' => ['error' => 'MediaCP User was not located successfully']]);
+                return;
+            }
+
+
+            # Update Service
+            $params = $this->buildServiceParameters((array)$vars, $package, $user);
+            $request = $api->apiRequest("/api/{$serviceFields->service_id}/media-service/update", $params, 'POST');
+
+            if ( $request->response()->status != 1 ){
+                $this->Input->setErrors(['api' => ['error' => "Unable to update service.\n\n{$request->response()->error}\n\nDebugging: " . print_r($response,true)]]);
+                return;
+            }
+
+            # Lookup service details
+            $request = $api->apiRequest("/api/{$serviceFields->service_id}/media-service/show");
+            $service = $request->response();
+            $vars['name'] = $service->unique_id;
+            $vars['portbase'] = $service->portbase;
+            $vars['username'] = $client->email;
+            $vars['customer_id'] = $service->user_id;
+            $vars['service_id'] = $service->id;
+            $vars['service_password'] = $service->password;
         }
 
         // Return all the service fields
         $encrypted_fields = [];
         $return = [];
-        $fields = ['name','portbase','username','password','customer_id','service_id'];
+        $fields = ['name','portbase','username','password','customer_id','service_id','service_password'];
         foreach ($fields as $field) {
-            if (isset($vars[$field]) || isset($service_fields[$field])) {
+            if (isset($vars[$field]) || isset($serviceFields->$field)) {
                 $return[] = [
                     'key' => $field,
-                    'value' => $vars[$field] ?? $service_fields[$field],
+                    'value' => $vars[$field] ?? $serviceFields->$field,
                     'encrypted' => (in_array($field, $encrypted_fields) ? 1 : 0)
                 ];
             }
@@ -1203,6 +1236,13 @@ class Mediacp extends Module
                     'if_set' => $edit,
                     'rule' => true,
                     'message' => Language::_('Mediacp.!error.service_id.valid', true)
+                ]
+            ],
+            'service_password' => [
+                'valid' => [
+                    'if_set' => $edit,
+                    'rule' => true,
+                    'message' => Language::_('Mediacp.!error.service_password.valid', true)
                 ]
             ]
         ];
@@ -1544,6 +1584,17 @@ class Mediacp extends Module
         );
         $fields->setField($service_id);
 
+        // Set the Service ID field
+        $service_password = $fields->label(Language::_('Mediacp.service_fields.service_password', true), 'service_password');
+        $service_password->attach(
+            $fields->fieldText(
+                'service_password',
+                (isset($vars->service_password) ? $vars->service_password : null),
+                ['id' => 'mediacp_service_password']
+            )
+        );
+        $fields->setField($service_password);
+
         return $fields;
     }
 
@@ -1627,6 +1678,17 @@ class Mediacp extends Module
         );
         $fields->setField($service_id);
 
+        // Set the Service Password field
+        $service_password = $fields->label(Language::_('Mediacp.service_fields.service_id', true), 'mediacp_service_password');
+        $service_password->attach(
+            $fields->fieldText(
+                'service_id',
+                (isset($vars->service_id) ? $vars->service_password : null),
+                ['id' => 'mediacp_service_password']
+            )
+        );
+        $fields->setField($service_password);
+
         return $fields;
     }
 
@@ -1709,6 +1771,17 @@ class Mediacp extends Module
             )
         );
         $fields->setField($service_id);
+
+        // Set the Service Password field
+        $service_password = $fields->label(Language::_('Mediacp.service_fields.service_id', true), 'mediacp_service_password');
+        $service_password->attach(
+            $fields->fieldText(
+                'service_id',
+                (isset($vars->service_id) ? $vars->service_password : null),
+                ['id' => 'mediacp_service_password']
+            )
+        );
+        $fields->setField($service_password);
 
         return $fields;
     }
