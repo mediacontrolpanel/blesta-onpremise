@@ -776,7 +776,7 @@ class Mediacp extends Module
 
             # Create Customer Account or catch already exists gracefully
             $userPassword = $this->generatePassword();
-            $response = $api->apiRequest("/api/0/user/store", [
+            $response = $api->apiRequest("/api/0/user/store", $params = [
                 'name' => $client->first_name . ' ' . $client->last_name,
                 'username' => $client->email,
                 'user_email' => $client->email,
@@ -1314,7 +1314,7 @@ class Mediacp extends Module
         Loader::load(dirname(__FILE__) . DS . 'apis' . DS . 'mediacp_api.php');
 
 //        See the apis/mediacp_api.php and apis/mediacp_response.php files
-        $api = new MediacpApi($hostname,$port,$usessl == 'true',$apikey);
+        $api = new MediacpApi($this->getModule(), $hostname,$port,$usessl == 'true',$apikey);
 
         return $api;
     }

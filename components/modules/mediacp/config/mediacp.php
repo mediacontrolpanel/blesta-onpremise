@@ -1,6 +1,6 @@
 <?php
 
-Configure::set('Whmsonic.email_templates', [
+Configure::set('Mediacp.email_templates', [
     'en_us' => [
         'lang' => 'en_us',
         'text' => 'Dear {client.first_name},
